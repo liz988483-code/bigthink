@@ -1,0 +1,24 @@
+.connect-intro{padding-top:36px;padding-bottom:30px;max-width:1180px}
+.connect-intro h2{font-size:26px;max-width:620px;margin:0 0 9px}
+.connect-intro>p:last-child{max-width:760px;color:#65758a;font-size:13px;line-height:1.65;margin:0}
+.connect-directory{padding-top:13px;padding-bottom:46px}
+.connect-directory .grow-section-heading{margin-bottom:17px}
+.connect-search{margin-bottom:13px}
+.connect-filters{margin-bottom:4px}
+.connect-filters button.selected,.connect-filters button:hover{background:#f2edff;border-color:#7137ce;color:#6130b2}
+.connect-program-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.connect-program{min-height:195px;display:flex;flex-direction:column;border:1px solid #e8edf2;border-radius:8px;padding:18px;box-shadow:0 3px 12px #172d4508}
+.connect-program-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#f2edff;color:#7137ce}
+.connect-program-category{margin:13px 0 0;font-size:9px;letter-spacing:.5px;text-transform:uppercase;font-weight:800;color:#7137ce}
+.connect-program h3{font-size:15px;margin:5px 0 7px}
+.connect-program>p{flex:1;font-size:11px;line-height:1.55;color:#65758a;margin:0 0 14px}
+.connect-program-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid #edf0f3;padding-top:11px}
+.connect-program-bottom span{font-size:9px;color:#7b8999}
+.connect-program-bottom a{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#7137ce;white-space:nowrap}
+.connect-how .grow-step-icon{background:#f2edff;color:#7137ce}
+.connect-host{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-top:30px;padding-bottom:35px}
+.connect-host h2{font-size:21px;margin:0 0 7px}
+.connect-host p:not(.eyebrow){font-size:12px;color:#65758a;margin:0;line-height:1.6}
+.connect-host .button{flex:none}
+@media(max-width:760px){.connect-intro{padding-top:29px}.connect-intro h2{font-size:23px}.connect-program-grid{grid-template-columns:repeat(2,1fr)}.connect-host{align-items:flex-start;flex-direction:column}}
+@media(max-width:480px){.connect-program-grid{grid-template-columns:1fr}.connect-program{min-height:unset}}

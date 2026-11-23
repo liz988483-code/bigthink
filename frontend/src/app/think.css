@@ -1,0 +1,21 @@
+.think-intro{display:grid;grid-template-columns:1fr 1fr;gap:35px;align-items:center;padding-top:37px;padding-bottom:33px}
+.think-intro h2{max-width:480px;font-size:25px;line-height:1.22;margin:0}
+.think-intro>div:last-child p{font-size:12px;line-height:1.7;color:#65758a;margin:0 0 8px}
+.think-service-section{background:#f5f8fb;padding:37px 0 44px}
+.think-service-section .grow-section-heading{margin-bottom:18px}
+.think-service-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.think-service{display:flex;flex-direction:column;min-height:210px;background:white;border:1px solid #e8edf2;border-radius:8px;padding:18px}
+.think-service-icon{width:42px;height:42px;display:grid;place-items:center;color:#1684df;background:#eaf3ff;border-radius:50%}
+.think-service h3{font-size:14px;line-height:1.35;margin:13px 0 7px}
+.think-service p{flex:1;color:#65758a;font-size:11px;line-height:1.55;margin:0 0 14px}
+.think-service>a{display:flex;align-items:center;gap:5px;color:#1684df;font-weight:700;font-size:10px}
+.think-how{background:#fff;padding-top:42px;padding-bottom:45px}
+.think-how .grow-step-icon{color:#1684df;background:#eaf3ff}
+.think-audiences{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-top:27px;padding-bottom:32px}
+.think-audiences>div{display:flex;align-items:center;gap:13px;color:#1684df}
+.think-audiences h2{color:#132b49;font-size:17px;margin:0 0 5px}
+.think-audiences p{color:#65758a;font-size:11px;line-height:1.6;margin:0}
+.think-audiences .button{flex:none}
+@media(max-width:900px){.think-service-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.think-intro{grid-template-columns:1fr;gap:12px;padding-top:29px}.think-intro h2{font-size:22px}.think-audiences{align-items:flex-start;flex-direction:column}}
+@media(max-width:480px){.think-service-grid{grid-template-columns:1fr}.think-service{min-height:unset}}

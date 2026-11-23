@@ -44,8 +44,10 @@ router.get("/managed", requireAuth, requireRole("employer", "talent_admin", "sup
 router.get("/managed/applications", requireAuth, requireRole("employer", "talent_admin", "super_admin"), async (req, res) => {
   const [rows] = await pool.execute<(RowDataPacket & Record<string, unknown>)[]>(
     `SELECT a.id, a.status, a.cover_note, a.created_at AS applied_at, u.full_name AS candidate_name, u.email AS candidate_email,
-      o.id AS opportunity_id, o.title AS opportunity_title
+      o.id AS opportunity_id, o.title AS opportunity_title,cp.skills AS candidate_skills,cp.capability_summary AS candidate_capabilities,
+      (SELECT JSON_ARRAYAGG(JSON_OBJECT('id',cd.id,'file_name',cd.file_name)) FROM candidate_documents cd WHERE cd.candidate_id=a.candidate_id) AS candidate_documents
      FROM applications a JOIN opportunities o ON o.id = a.opportunity_id JOIN users u ON u.id = a.candidate_id
+     LEFT JOIN candidate_profiles cp ON cp.user_id=a.candidate_id
      WHERE (? IN ('talent_admin', 'super_admin') OR o.created_by = ?) ORDER BY a.created_at DESC`, [req.user!.role, req.user!.id],
   );
   return res.json({ applications: rows });
@@ -108,6 +110,32 @@ router.post("/:id/applications", requireAuth, requireRole("candidate"), applicat
     if (isDuplicate(error)) return res.status(409).json({ error: "You have already applied for this opportunity." });
     throw error;
   }
+});
+
+router.get("/applications/:applicationId/candidate-resume",requireAuth,requireRole("employer","talent_admin","super_admin"),async(req,res)=>{
+  const [rows]=await pool.execute<(RowDataPacket & {resume_name:string|null;resume_mime:string|null;resume_data:Buffer|null})[]>(
+    `SELECT cp.resume_name,cp.resume_mime,cp.resume_data FROM applications a
+     JOIN opportunities o ON o.id=a.opportunity_id JOIN candidate_profiles cp ON cp.user_id=a.candidate_id
+     WHERE a.id=? AND (? IN ('talent_admin','super_admin') OR o.created_by=?) LIMIT 1`,
+    [String(req.params.applicationId),req.user!.role,req.user!.id],
+  );
+  const resume=rows[0];
+  if(!resume?.resume_data)return res.status(404).json({error:"No résumé is attached to this application."});
+  res.setHeader("Content-Type",resume.resume_mime??"application/octet-stream");
+  res.setHeader("Content-Disposition",`attachment; filename="${(resume.resume_name??"candidate-file").replace(/[\"\\]/g,"")}"`);
+  return res.send(resume.resume_data);
+});
+
+router.get("/applications/:applicationId/candidate-documents/:documentId",requireAuth,requireRole("employer","talent_admin","super_admin"),async(req,res)=>{
+  const [rows]=await pool.execute<(RowDataPacket & {file_name:string;mime_type:string;file_data:Buffer})[]>(
+    `SELECT cd.file_name,cd.mime_type,cd.file_data FROM applications a JOIN opportunities o ON o.id=a.opportunity_id
+     JOIN candidate_documents cd ON cd.candidate_id=a.candidate_id WHERE a.id=? AND cd.id=?
+     AND (? IN ('talent_admin','super_admin') OR o.created_by=?) LIMIT 1`,
+    [String(req.params.applicationId),String(req.params.documentId),req.user!.role,req.user!.id],
+  );
+  if(!rows[0])return res.status(404).json({error:"File not found for an application you manage."});
+  res.setHeader("Content-Type",rows[0].mime_type);res.setHeader("Content-Disposition",`attachment; filename="${rows[0].file_name.replace(/[\"\\]/g,"")}"`);
+  return res.send(rows[0].file_data);
 });
 
 router.get("/:id", async (req, res) => {

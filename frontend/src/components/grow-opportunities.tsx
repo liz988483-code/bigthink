@@ -26,6 +26,7 @@ export function GrowOpportunities() {
   const [pending, setPending] = useState(false);
   const [type, setType] = useState("All");
   const [query, setQuery] = useState("");
+  const [preferenceLoaded,setPreferenceLoaded]=useState(false);
   useEffect(() => {
     fetch(`${apiUrl}/api/opportunities`)
       .then(async (response) => {
@@ -36,6 +37,14 @@ export function GrowOpportunities() {
       })
       .catch(() => setNotice("Showing example listings. Live opportunities will appear when the Bigthink API is connected."));
   }, []);
+  useEffect(()=>{
+    fetch(`${apiUrl}/api/candidates/me`,{credentials:"include"}).then(async(response)=>{
+      if(!response.ok)return;
+      const data=await response.json() as {profile?:{opportunityPreference:string}};
+      if(data.profile?.opportunityPreference==="job")setType("Job");
+      if(data.profile?.opportunityPreference==="attachment")setType("Attachment");
+    }).catch(()=>undefined).finally(()=>setPreferenceLoaded(true));
+  },[]);
 
   async function apply(opportunityId: string) {
     setPending(true);
@@ -53,7 +62,7 @@ export function GrowOpportunities() {
   }
 
   const results = useMemo(() => listings.filter((item) => {
-    const matchesType = type === "All" || item.type === type;
+    const matchesType = type === "All" || item.type === type || (type === "Job" && item.type === "Internship");
     const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
     const content = `${item.title} ${item.company} ${item.type} ${item.location} ${item.duration} ${item.description}`.toLowerCase();
     return matchesType && words.every((word) => content.includes(word));
@@ -64,6 +73,7 @@ export function GrowOpportunities() {
       <label className="grow-search"><Search size={18}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by role, company or location" aria-label="Search opportunities"/></label>
       <div className="grow-filters" aria-label="Filter by opportunity type">{types.map((item) => <button type="button" key={item} aria-pressed={type === item} className={type === item ? "selected" : ""} onClick={() => setType(item)}>{item === "All" ? "All opportunities" : `${item}s`}</button>)}</div>
     </div>
+    {preferenceLoaded&&type!=="All"&&<p className="grow-count">Showing your saved preference: {type==="Job"?"jobs and internships":type.toLowerCase()+"s"}.</p>}
     {notice && <p className="grow-count" role="status">{notice}</p>}
     {liveData && listings.length === 0 && <p className="grow-count">There are no published opportunities right now. Please check back soon.</p>}
     {!liveData && listings.length > 0 && <p className="grow-count">Example listings</p>}
